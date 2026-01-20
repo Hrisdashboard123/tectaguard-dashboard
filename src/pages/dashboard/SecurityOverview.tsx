@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import {
   Shield,
@@ -10,10 +12,12 @@ import {
   CheckCircle,
   XCircle,
   ArrowUpRight,
+  Loader2,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 
 const securityMetrics = [
   {
@@ -111,6 +115,64 @@ const threatTimeline = [
 ];
 
 const SecurityOverview = () => {
+  const navigate = useNavigate();
+  const { toast } = useToast();
+  const [isScanning, setIsScanning] = useState(false);
+
+  const handleRunFullScan = async () => {
+    setIsScanning(true);
+    toast({
+      title: "Security Scan Initiated",
+      description: "Running comprehensive AI security analysis...",
+    });
+    
+    // Simulate scan
+    await new Promise((resolve) => setTimeout(resolve, 2000));
+    
+    setIsScanning(false);
+    toast({
+      title: "Scan Complete",
+      description: "Found 3 new vulnerabilities. View details in Vulnerability Scanner.",
+    });
+    navigate("/dashboard/vulnerabilities");
+  };
+
+  const handleStartSecurityScan = () => {
+    navigate("/dashboard/vulnerabilities");
+    toast({
+      title: "Redirecting to Scanner",
+      description: "Start a new vulnerability scan from here.",
+    });
+  };
+
+  const handleConnectRepository = () => {
+    navigate("/dashboard/vulnerabilities");
+    toast({
+      title: "Connect Repository",
+      description: "Add your code repositories for continuous scanning.",
+    });
+  };
+
+  const handleAddInfrastructure = () => {
+    navigate("/dashboard/infrastructure");
+    toast({
+      title: "Add Infrastructure",
+      description: "Configure your servers and cloud resources.",
+    });
+  };
+
+  const handleConfigureAlerts = () => {
+    navigate("/dashboard/settings");
+    toast({
+      title: "Alert Settings",
+      description: "Configure your notification preferences.",
+    });
+  };
+
+  const handleViewAllThreats = () => {
+    navigate("/dashboard/threats");
+  };
+
   const container = {
     hidden: { opacity: 0 },
     show: {
@@ -188,8 +250,20 @@ const SecurityOverview = () => {
               <CardTitle className="text-lg font-heading">
                 AI Security Analysis
               </CardTitle>
-              <Button variant="gold-outline" size="sm">
-                Run Full Scan
+              <Button 
+                variant="gold-outline" 
+                size="sm"
+                onClick={handleRunFullScan}
+                disabled={isScanning}
+              >
+                {isScanning ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    Scanning...
+                  </>
+                ) : (
+                  "Run Full Scan"
+                )}
               </Button>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -322,7 +396,12 @@ const SecurityOverview = () => {
               <CardTitle className="text-lg font-heading">
                 Live Threats
               </CardTitle>
-              <Button variant="ghost" size="sm" className="text-primary">
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                className="text-primary"
+                onClick={handleViewAllThreats}
+              >
                 View All
                 <ArrowUpRight className="w-4 h-4 ml-1" />
               </Button>
@@ -377,19 +456,19 @@ const SecurityOverview = () => {
         <Card className="glass-card border-border/50">
           <CardContent className="py-4">
             <div className="flex flex-wrap gap-3">
-              <Button variant="gold" size="lg">
+              <Button variant="gold" size="lg" onClick={handleStartSecurityScan}>
                 <Shield className="w-5 h-5 mr-2" />
                 Start Security Scan
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={handleConnectRepository}>
                 <Code className="w-5 h-5 mr-2" />
                 Connect Repository
               </Button>
-              <Button variant="outline" size="lg">
+              <Button variant="outline" size="lg" onClick={handleAddInfrastructure}>
                 <Server className="w-5 h-5 mr-2" />
                 Add Infrastructure
               </Button>
-              <Button variant="subtle" size="lg">
+              <Button variant="subtle" size="lg" onClick={handleConfigureAlerts}>
                 <AlertTriangle className="w-5 h-5 mr-2" />
                 Configure Alerts
               </Button>
